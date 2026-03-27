@@ -1,10 +1,9 @@
-// @ts-nocheck
 "use client";
 
 import { useState } from "react";
 import { useMutation, useQuery } from "convex/react";
-import { api } from "../convex/_generated/api";
-import type { Id } from "../convex/_generated/dataModel";
+import { api } from "@/convex/_generated/api";
+import type { Id } from "@/convex/_generated/dataModel";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";

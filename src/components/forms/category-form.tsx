@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import { useState } from "react";
@@ -105,7 +104,7 @@ export function CategoryForm({ mode, categoryId, defaultValues }: CategoryFormPr
           </div>
           <div className="space-y-2">
             <Label htmlFor="budgetLineId">Budget Line</Label>
-            <Select value={budgetLineId} onValueChange={setBudgetLineId}>
+            <Select value={budgetLineId} onValueChange={(v) => v !== null && setBudgetLineId(v)}>
               <SelectTrigger><SelectValue placeholder="Select budget line (optional)" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="none">None</SelectItem>

@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import { useState } from "react";
@@ -152,7 +151,7 @@ export function ExpenseForm({ mode, expenseId, defaultValues }: ExpenseFormProps
             </div>
             <div className="space-y-2">
               <Label htmlFor="categoryId">Category *</Label>
-              <Select value={categoryId} onValueChange={setCategoryId}>
+              <Select value={categoryId} onValueChange={(v) => v !== null && setCategoryId(v)}>
                 <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
                 <SelectContent>
                   {categories?.map((cat) => (
@@ -164,7 +163,7 @@ export function ExpenseForm({ mode, expenseId, defaultValues }: ExpenseFormProps
             </div>
             <div className="space-y-2">
               <Label htmlFor="paymentMethod">Payment Method *</Label>
-              <Select value={paymentMethod} onValueChange={(v) => setPaymentMethod(v as PaymentMethod)}>
+              <Select value={paymentMethod} onValueChange={(v) => v !== null && setPaymentMethod(v as PaymentMethod)}>
                 <SelectTrigger><SelectValue placeholder="Select method" /></SelectTrigger>
                 <SelectContent>
                   {PAYMENT_METHODS.map((pm) => (

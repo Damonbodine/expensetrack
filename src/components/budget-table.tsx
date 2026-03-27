@@ -1,9 +1,8 @@
-// @ts-nocheck
 "use client";
 
 import { useState } from "react";
 import { useQuery } from "convex/react";
-import { api } from "../convex/_generated/api";
+import { api } from "@/convex/_generated/api";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -47,7 +46,7 @@ export function BudgetTable() {
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3 flex-wrap">
-        <Select value={fiscalYear} onValueChange={setFiscalYear}>
+        <Select value={fiscalYear} onValueChange={(v) => v !== null && setFiscalYear(v)}>
           <SelectTrigger className="w-[160px]">
             <SelectValue placeholder="Fiscal Year" />
           </SelectTrigger>
@@ -60,7 +59,7 @@ export function BudgetTable() {
             ))}
           </SelectContent>
         </Select>
-        <Select value={department} onValueChange={setDepartment}>
+        <Select value={department} onValueChange={(v) => v !== null && setDepartment(v)}>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Department" />
           </SelectTrigger>

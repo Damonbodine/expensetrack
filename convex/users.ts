@@ -7,9 +7,11 @@ export const getCurrentUser = query({
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) return null;
+    const clerkId = identity.tokenIdentifier ?? identity.subject ?? "";
+    const subjectPart = clerkId.includes("|") ? clerkId.split("|").pop()! : clerkId;
     return await ctx.db
       .query("users")
-      .withIndex("by_clerkId", (q) => q.eq("clerkId", identity.subject))
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", subjectPart))
       .unique();
   },
 });

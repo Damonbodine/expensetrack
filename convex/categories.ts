@@ -87,3 +87,20 @@ export const updateCategory = mutation({
     return args.categoryId;
   },
 });
+
+export const deleteCategory = mutation({
+  args: { categoryId: v.id("categories") },
+  handler: async (ctx, args) => {
+    const currentUser = await requireRole(ctx, "Admin");
+    const category = await ctx.db.get(args.categoryId);
+    if (!category) throw new Error("The requested resource was not found.");
+    // Check if any expenses reference this category
+    const expenses = await ctx.db.query("expenses").withIndex("by_categoryId", (q) => q.eq("categoryId", args.categoryId)).first();
+    if (expenses) {
+      throw new Error("This category cannot be deleted because it has associated expenses.");
+    }
+    await ctx.db.delete(args.categoryId);
+    await createAuditLog(ctx, currentUser._id, "Delete", "categories", args.categoryId, `Deleted category: ${category.name} (${category.code})`);
+    return null;
+  },
+});

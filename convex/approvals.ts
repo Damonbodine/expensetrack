@@ -219,7 +219,7 @@ export const returnReport = mutation({
       await ctx.db.patch(expense._id, { status: "Draft", updatedAt: now });
     }
     // Notify submitter
-    await createNotification(ctx, report.submittedById, "ReportRejected", "Report Returned for Revision", `Your expense report "${report.title}" has been returned for revision by ${currentUser.name}. Reason: ${args.comments}`, `/reports/${args.reportId}`);
+    await createNotification(ctx, report.submittedById, "SystemAlert", "Report Returned for Revision", `Your expense report "${report.title}" has been returned for revision by ${currentUser.name}. Reason: ${args.comments}`, `/reports/${args.reportId}`);
     await createAuditLog(ctx, currentUser._id, "StatusChange", "expenseReports", args.reportId, `Returned report for revision: ${report.title}. Reason: ${args.comments}`);
     return approvalId;
   },

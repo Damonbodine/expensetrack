@@ -130,7 +130,7 @@ export const updateReport = mutation({
     const currentUser = await getCurrentUserOrThrow(ctx);
     const report = await ctx.db.get(args.reportId);
     if (!report) throw new Error("The requested resource was not found.");
-    if (report.submittedById !== currentUser._id) {
+    if (report.submittedById !== currentUser._id && currentUser.role !== "Admin") {
       throw new Error("You do not have permission to perform this action.");
     }
     if (report.status !== "Draft") {
@@ -154,7 +154,7 @@ export const deleteReport = mutation({
     const currentUser = await getCurrentUserOrThrow(ctx);
     const report = await ctx.db.get(args.reportId);
     if (!report) throw new Error("The requested resource was not found.");
-    if (report.submittedById !== currentUser._id) {
+    if (report.submittedById !== currentUser._id && currentUser.role !== "Admin") {
       throw new Error("You do not have permission to perform this action.");
     }
     if (report.status !== "Draft") {
@@ -168,6 +168,31 @@ export const deleteReport = mutation({
     await ctx.db.delete(args.reportId);
     await createAuditLog(ctx, currentUser._id, "Delete", "expenseReports", args.reportId, `Deleted report: ${report.title}`);
     return null;
+  },
+});
+
+export const reimburseReport = mutation({
+  args: { reportId: v.id("expenseReports") },
+  handler: async (ctx, args) => {
+    const currentUser = await requireRole(ctx, "Admin");
+    const report = await ctx.db.get(args.reportId);
+    if (!report) throw new Error("The requested resource was not found.");
+    if (report.status !== "Approved") {
+      throw new Error("Only approved expense reports can be marked as reimbursed.");
+    }
+    const now = Date.now();
+    await ctx.db.patch(args.reportId, {
+      status: "Reimbursed",
+      updatedAt: now,
+    });
+    // Update all expenses in the report to Reimbursed
+    const expenses = await ctx.db.query("expenses").withIndex("by_reportId", (q) => q.eq("reportId", args.reportId)).collect();
+    for (const expense of expenses) {
+      await ctx.db.patch(expense._id, { status: "Reimbursed", updatedAt: now });
+    }
+    await createAuditLog(ctx, currentUser._id, "Reimburse", "expenseReports", args.reportId, `Reimbursed report: ${report.title}. Total: $${report.totalAmount.toFixed(2)}`);
+    await createNotification(ctx, report.submittedById, "ExpenseReimbursed", "Expense Report Reimbursed", `Your expense report "${report.title}" for ${`$${report.totalAmount.toFixed(2)}`} has been reimbursed.`, `/reports/${args.reportId}`);
+    return args.reportId;
   },
 });
 

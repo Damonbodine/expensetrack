@@ -1,10 +1,8 @@
-// @ts-nocheck
 "use client";
 
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useConvexAuth, useQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
+import { useConvexAuth } from "convex/react";
 import { Loader2 } from "lucide-react";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
@@ -12,10 +10,6 @@ import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 export default function AuthLayout({ children }: { children: ReactNode }) {
   const { isAuthenticated, isLoading: authLoading } = useConvexAuth();
   const router = useRouter();
-  const currentUser = useQuery(
-    api.users.getCurrentUser,
-    isAuthenticated ? {} : "skip"
-  );
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -31,17 +25,9 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
     );
   }
 
-  if (currentUser === undefined) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
-    );
-  }
-
   return (
     <SidebarProvider>
-      <AppSidebar user={currentUser} />
+      <AppSidebar />
       <SidebarInset>
         <main className="flex-1 p-6">{children}</main>
       </SidebarInset>

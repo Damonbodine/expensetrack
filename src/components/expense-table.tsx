@@ -1,10 +1,9 @@
-// @ts-nocheck
 "use client";
 
 import { useState } from "react";
 import { useQuery, useMutation } from "convex/react";
-import { api } from "../convex/_generated/api";
-import type { Id } from "../convex/_generated/dataModel";
+import { api } from "@/convex/_generated/api";
+import type { Id } from "@/convex/_generated/dataModel";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -115,7 +114,7 @@ export function ExpenseTable() {
           onChange={(e) => setSearch(e.target.value)}
           className="max-w-xs"
         />
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
+        <Select value={statusFilter} onValueChange={(v) => v !== null && setStatusFilter(v)}>
           <SelectTrigger className="w-[160px]">
             <SelectValue placeholder="Status" />
           </SelectTrigger>
@@ -128,7 +127,7 @@ export function ExpenseTable() {
             <SelectItem value="Reimbursed">Reimbursed</SelectItem>
           </SelectContent>
         </Select>
-        <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+        <Select value={categoryFilter} onValueChange={(v) => v !== null && setCategoryFilter(v)}>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Category" />
           </SelectTrigger>
@@ -208,15 +207,17 @@ export function ExpenseTable() {
                             </Link>
                           </Button>
                           <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8 text-destructive hover:text-destructive"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </AlertDialogTrigger>
+                            <AlertDialogTrigger
+                              render={
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 text-destructive hover:text-destructive"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              }
+                            />
                             <AlertDialogContent>
                               <AlertDialogHeader>
                                 <AlertDialogTitle>Delete Expense</AlertDialogTitle>

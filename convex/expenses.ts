@@ -38,7 +38,7 @@ export const listExpenses = query({
       expenses.map(async (expense) => {
         const category = await ctx.db.get(expense.categoryId);
         const submitter = await ctx.db.get(expense.submittedById);
-        return { ...expense, category, submitter };
+        return { ...expense, categoryName: category?.name, submitter };
       })
     );
     return enriched;
@@ -141,7 +141,7 @@ export const updateExpense = mutation({
     const currentUser = await getCurrentUserOrThrow(ctx);
     const expense = await ctx.db.get(args.expenseId);
     if (!expense) throw new Error("The requested resource was not found.");
-    if (expense.submittedById !== currentUser._id) {
+    if (expense.submittedById !== currentUser._id && currentUser.role !== "Admin") {
       throw new Error("You do not have permission to perform this action.");
     }
     if (expense.status !== "Draft") {
@@ -177,7 +177,7 @@ export const deleteExpense = mutation({
     const currentUser = await getCurrentUserOrThrow(ctx);
     const expense = await ctx.db.get(args.expenseId);
     if (!expense) throw new Error("The requested resource was not found.");
-    if (expense.submittedById !== currentUser._id) {
+    if (expense.submittedById !== currentUser._id && currentUser.role !== "Admin") {
       throw new Error("You do not have permission to perform this action.");
     }
     if (expense.status !== "Draft") {
@@ -233,9 +233,9 @@ export const addToReport = mutation({
       throw new Error("This expense report can only be modified while in Draft status.");
     }
     await ctx.db.patch(args.expenseId, { reportId: args.reportId, updatedAt: Date.now() });
-    // Recalculate report total
+    // Recalculate report total (the patched expense is already included in the query)
     const reportExpenses = await ctx.db.query("expenses").withIndex("by_reportId", (q) => q.eq("reportId", args.reportId)).collect();
-    const total = reportExpenses.reduce((sum, e) => sum + e.amount, 0) + expense.amount;
+    const total = reportExpenses.reduce((sum, e) => sum + e.amount, 0);
     await ctx.db.patch(args.reportId, { totalAmount: total, updatedAt: Date.now() });
     await createAuditLog(ctx, currentUser._id, "Update", "expenses", args.expenseId, `Added expense to report ${args.reportId}`);
     return args.expenseId;

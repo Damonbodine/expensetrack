@@ -1,10 +1,9 @@
-// @ts-nocheck
 "use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useQuery } from "convex/react";
-import { api } from "../convex/_generated/api";
+import { api } from "@/convex/_generated/api";
 import { useClerk } from "@clerk/nextjs";
 import {
   Sidebar,
@@ -101,17 +100,15 @@ export function AppSidebar() {
             return (
               <SidebarMenuItem key={item.href}>
                 <SidebarMenuButton
-                  asChild
+                  render={<Link href={item.href} />}
                   isActive={isActive}
                   className={cn(
                     "gap-3 px-3 py-2 text-sm font-medium",
                     isActive && "bg-sidebar-accent text-sidebar-accent-foreground"
                   )}
                 >
-                  <Link href={item.href}>
-                    <item.icon className="h-4 w-4" />
-                    <span>{item.label}</span>
-                  </Link>
+                  <item.icon className="h-4 w-4" />
+                  <span>{item.label}</span>
                 </SidebarMenuButton>
                 {item.label === "Notifications" && unreadCount && unreadCount > 0 ? (
                   <SidebarMenuBadge className="bg-destructive text-destructive-foreground text-xs">

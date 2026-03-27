@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 
 import { useState } from "react";
@@ -99,7 +98,7 @@ export function BudgetLineForm({ mode, budgetLineId, defaultValues }: BudgetLine
             </div>
             <div className="space-y-2">
               <Label htmlFor="categoryId">Category *</Label>
-              <Select value={categoryId} onValueChange={setCategoryId} disabled={mode === "edit"}>
+              <Select value={categoryId} onValueChange={(v) => v !== null && setCategoryId(v)} disabled={mode === "edit"}>
                 <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
                 <SelectContent>
                   {categories?.map((cat) => (

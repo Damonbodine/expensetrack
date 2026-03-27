@@ -40,6 +40,20 @@ export const markAsRead = mutation({
   },
 });
 
+export const deleteNotification = mutation({
+  args: { notificationId: v.id("notifications") },
+  handler: async (ctx, args) => {
+    const currentUser = await getCurrentUserOrThrow(ctx);
+    const notification = await ctx.db.get(args.notificationId);
+    if (!notification) throw new Error("The requested resource was not found.");
+    if (notification.userId !== currentUser._id) {
+      throw new Error("You do not have permission to perform this action.");
+    }
+    await ctx.db.delete(args.notificationId);
+    return null;
+  },
+});
+
 export const markAllAsRead = mutation({
   args: {},
   handler: async (ctx) => {

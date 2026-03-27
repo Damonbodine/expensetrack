@@ -1,18 +1,24 @@
-import { MutationCtx } from "./_generated/server";
-import { Id } from "./_generated/dataModel";
+import { MutationCtx, QueryCtx } from "./_generated/server";
+import { Id, Doc } from "./_generated/dataModel";
 
-export async function getCurrentUserOrThrow(ctx: { auth: { getUserIdentity: () => Promise<any> }; db: any }) {
+type ConvexCtx = { auth: { getUserIdentity: () => Promise<{ subject?: string; tokenIdentifier?: string } | null> }; db: any };
+
+export async function getCurrentUserOrThrow(ctx: ConvexCtx): Promise<Doc<"users">> {
   const identity = await ctx.auth.getUserIdentity();
   if (!identity) throw new Error("Authentication required. Please sign in to continue.");
+  // Try tokenIdentifier first (includes issuer prefix), fallback to subject for backwards compat
+  const clerkId = identity.tokenIdentifier ?? identity.subject ?? "";
+  // tokenIdentifier is typically "https://clerk.xxx|user_xxx" -- we store just the user_xxx part
+  const subjectPart = clerkId.includes("|") ? clerkId.split("|").pop()! : clerkId;
   const user = await ctx.db
     .query("users")
-    .withIndex("by_clerkId", (q: any) => q.eq("clerkId", identity.subject))
+    .withIndex("by_clerkId", (q: any) => q.eq("clerkId", subjectPart))
     .unique();
   if (!user) throw new Error("User profile not found. Please complete registration.");
   return user;
 }
 
-export async function requireRole(ctx: { auth: { getUserIdentity: () => Promise<any> }; db: any }, ...roles: string[]) {
+export async function requireRole(ctx: ConvexCtx, ...roles: string[]): Promise<Doc<"users">> {
   const user = await getCurrentUserOrThrow(ctx);
   if (!roles.includes(user.role)) {
     throw new Error("You do not have permission to perform this action.");

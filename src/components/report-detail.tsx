@@ -1,9 +1,8 @@
-// @ts-nocheck
 "use client";
 
 import { useQuery, useMutation } from "convex/react";
-import { api } from "../convex/_generated/api";
-import type { Id } from "../convex/_generated/dataModel";
+import { api } from "@/convex/_generated/api";
+import type { Id } from "@/convex/_generated/dataModel";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,7 +17,7 @@ import {
 } from "@/components/ui/table";
 import { StatusBadge } from "@/components/status-badge";
 import { formatCurrency, formatDate } from "@/lib/utils";
-import { Pencil, Trash2, Send, FileText } from "lucide-react";
+import { Pencil, Trash2, Send, FileText, DollarSign } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -37,16 +36,21 @@ interface ReportDetailProps {
 
 export function ReportDetail({ reportId }: ReportDetailProps) {
   const router = useRouter();
+  const currentUser = useQuery(api.users.getCurrentUser);
   const report = useQuery(api.expenseReports.getReport, { reportId });
-  const expenses = useQuery(api.expenses.listExpensesByReport, { reportId });
+  // Use expenses enriched with category from getReport instead of a separate query
+  const expenses = report?.expenses;
   const deleteReport = useMutation(api.expenseReports.deleteReport);
   const submitReport = useMutation(api.expenseReports.submitReport);
+  const reimburseReport = useMutation(api.expenseReports.reimburseReport);
 
   if (!report) {
     return <div className="p-8 text-center text-muted-foreground">Loading report...</div>;
   }
 
   const isDraft = report.status === "Draft";
+  const isApproved = report.status === "Approved";
+  const isAdmin = currentUser?.role === "Admin";
 
   const handleDelete = async () => {
     await deleteReport({ reportId });
@@ -55,6 +59,10 @@ export function ReportDetail({ reportId }: ReportDetailProps) {
 
   const handleSubmit = async () => {
     await submitReport({ reportId });
+  };
+
+  const handleReimburse = async () => {
+    await reimburseReport({ reportId });
   };
 
   return (
@@ -108,12 +116,14 @@ export function ReportDetail({ reportId }: ReportDetailProps) {
                 </Link>
               </Button>
               <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="outline" className="text-destructive hover:text-destructive">
-                    <Trash2 className="h-4 w-4 mr-1" />
-                    Delete
-                  </Button>
-                </AlertDialogTrigger>
+                <AlertDialogTrigger
+                  render={
+                    <Button variant="outline" className="text-destructive hover:text-destructive">
+                      <Trash2 className="h-4 w-4 mr-1" />
+                      Delete
+                    </Button>
+                  }
+                />
                 <AlertDialogContent>
                   <AlertDialogHeader>
                     <AlertDialogTitle>Delete Report</AlertDialogTitle>
@@ -129,6 +139,36 @@ export function ReportDetail({ reportId }: ReportDetailProps) {
                       onClick={handleDelete}
                     >
                       Delete
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
+          )}
+
+          {isApproved && isAdmin && (
+            <div className="flex items-center gap-2 mt-6 pt-4 border-t border-border">
+              <AlertDialog>
+                <AlertDialogTrigger
+                  render={
+                    <Button>
+                      <DollarSign className="h-4 w-4 mr-1" />
+                      Mark as Reimbursed
+                    </Button>
+                  }
+                />
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Mark as Reimbursed</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Are you sure you want to mark this report as reimbursed? This will update all
+                      included expenses to &quot;Reimbursed&quot; status and notify the submitter.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleReimburse}>
+                      Confirm Reimbursement
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
@@ -181,7 +221,7 @@ export function ReportDetail({ reportId }: ReportDetailProps) {
                       {formatDate(exp.date)}
                     </TableCell>
                     <TableCell className="text-muted-foreground">
-                      {exp.categoryName ?? "—"}
+                      {exp.category?.name ?? "—"}
                     </TableCell>
                     <TableCell>
                       <StatusBadge status={exp.status} />
