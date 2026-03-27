@@ -3,6 +3,8 @@ import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { ConvexClientProvider } from "@/components/convex-client-provider";
 
+export const dynamic = 'force-dynamic';
+
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-sans",
@@ -24,7 +26,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <body className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`}>
         <ConvexClientProvider>{children}</ConvexClientProvider>
       </body>
