@@ -1,0 +1,16 @@
+Run is **completed** — all 27 steps passed with 0 failures.
+
+`★ Insight ─────────────────────────────────────`
+**What was built:**
+1. **`convex/ai.ts`** — Reusable OpenRouter API action pattern with `callOpenRouter()` helper. Uses Convex `action` (not `mutation`/`query`) because actions can make external HTTP calls. Each AI feature is a separate exported action with typed args.
+
+2. **Smart Receipt Parser** — Uses structured JSON output prompting to extract expense fields from free-form text. The `onParsed` callback pattern lets the parent form control state while the parser handles AI interaction.
+
+3. **Report Narrative** — Takes enriched expense data as props and generates a finance-committee-ready summary. Copy-to-clipboard is built in for easy pasting into documents.
+
+4. **Policy Compliance Checker** — Returns structured JSON with individual policy checks. Each check has its own pass/warning/fail status with specific policy references, displayed with shield icons.
+
+5. **Budget Variance Explainer** — Receives budget line data including all expenses and generates contextual analysis of why actuals diverge from budget.
+`─────────────────────────────────────────────────`
+
+**Files created:** 5 | **Files modified:** 4 | **Build:** passing | **Commit:** `94487b8`
