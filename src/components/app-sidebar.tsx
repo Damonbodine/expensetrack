@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useClerk } from "@clerk/nextjs";
@@ -30,6 +30,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { withPreservedDemoQuery } from "@/lib/demo";
 
 type NavItem = {
   label: string;
@@ -43,6 +44,7 @@ export function AppSidebar() {
   const currentUser = useQuery(api.users.getCurrentUser);
   const unreadCount = useQuery(api.notifications.getUnreadCount);
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { signOut } = useClerk();
 
   const role = currentUser?.role ?? "Submitter";
@@ -86,7 +88,7 @@ export function AppSidebar() {
   return (
     <Sidebar className="border-r-0">
       <SidebarHeader className="px-4 py-4 border-b border-sidebar-border">
-        <Link href="/" className="flex items-center gap-2">
+        <Link href={withPreservedDemoQuery("/", searchParams)} className="flex items-center gap-2">
           <DollarSign className="h-6 w-6 text-sidebar-primary" />
           <span className="text-lg font-bold tracking-tight text-sidebar-foreground">
             ExpenseTrack
@@ -100,7 +102,7 @@ export function AppSidebar() {
             return (
               <SidebarMenuItem key={item.href}>
                 <SidebarMenuButton
-                  render={<Link href={item.href} />}
+                  render={<Link href={withPreservedDemoQuery(item.href, searchParams)} />}
                   isActive={isActive}
                   className={cn(
                     "gap-3 px-3 py-2 text-sm font-medium",

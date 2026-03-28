@@ -5,7 +5,7 @@ import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Table,
   TableBody,
@@ -37,12 +37,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { withPreservedDemoQuery } from "@/lib/demo";
 
 type SortField = "title" | "amount" | "date" | "merchant";
 type SortDir = "asc" | "desc";
 
 export function ExpenseTable() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [search, setSearch] = useState("");
@@ -106,7 +108,7 @@ export function ExpenseTable() {
   );
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" data-demo="expenses-list">
       <div className="flex items-center gap-3 flex-wrap">
         <Input
           placeholder="Search by title or merchant..."
@@ -141,7 +143,7 @@ export function ExpenseTable() {
           </SelectContent>
         </Select>
         <div className="flex-1" />
-        <Button onClick={() => router.push("/expenses/new")}>
+        <Button onClick={() => router.push(withPreservedDemoQuery("/expenses/new", searchParams))}>
           <Plus className="h-4 w-4 mr-1" />
           New Expense
         </Button>
@@ -190,7 +192,7 @@ export function ExpenseTable() {
                         className="h-8 w-8"
                         asChild
                       >
-                        <Link href={`/expenses/${expense._id}`}>
+                        <Link href={withPreservedDemoQuery(`/expenses/${expense._id}`, searchParams)}>
                           <Eye className="h-4 w-4" />
                         </Link>
                       </Button>
@@ -202,7 +204,7 @@ export function ExpenseTable() {
                             className="h-8 w-8"
                             asChild
                           >
-                            <Link href={`/expenses/${expense._id}/edit`}>
+                            <Link href={withPreservedDemoQuery(`/expenses/${expense._id}/edit`, searchParams)}>
                               <Pencil className="h-4 w-4" />
                             </Link>
                           </Button>

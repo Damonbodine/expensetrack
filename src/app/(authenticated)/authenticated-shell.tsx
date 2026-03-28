@@ -6,6 +6,7 @@ import { useConvexAuth } from "convex/react";
 import { Loader2 } from "lucide-react";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import { DemoMode } from "@/components/demo-mode";
 
 export function AuthenticatedShell({ children }: { children: ReactNode }) {
   const { isAuthenticated, isLoading: authLoading } = useConvexAuth();
@@ -30,6 +31,7 @@ export function AuthenticatedShell({ children }: { children: ReactNode }) {
       <AppSidebar />
       <SidebarInset>
         <main className="flex-1 p-6">{children}</main>
+        <DemoMode />
       </SidebarInset>
     </SidebarProvider>
   );

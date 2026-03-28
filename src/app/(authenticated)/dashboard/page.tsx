@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatCurrency } from "@/lib/utils";
 import { DollarSign, FileText, TrendingUp, Wallet } from "lucide-react";
+import { DemoModeStartButton } from "@/components/demo-mode";
 
 export default function AdminDashboardPage() {
   const dashboard = useQuery(api.dashboard.getAdminDashboard, {});
@@ -17,7 +18,10 @@ export default function AdminDashboardPage() {
   return (
     <RoleGuard allowedRoles={["Admin"]}>
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+        <div className="flex items-center justify-between gap-4" data-demo="dashboard-overview">
+          <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+          <DemoModeStartButton />
+        </div>
 
         {!dashboard ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -27,7 +31,7 @@ export default function AdminDashboardPage() {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" data-demo="dashboard-stats">
               <StatCard
                 title="Total Spending"
                 value={formatCurrency(dashboard.totalSpending)}
@@ -51,7 +55,7 @@ export default function AdminDashboardPage() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card className="border border-border">
+              <Card className="border border-border" data-demo="budget-utilization">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base font-semibold">Spending by Category</CardTitle>
                 </CardHeader>

@@ -9,13 +9,16 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { Eye } from "lucide-react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { withPreservedDemoQuery } from "@/lib/demo";
 
 export default function ApprovalsListPage() {
   const pendingReports = useQuery(api.expenseReports.listPendingForApproval);
+  const searchParams = useSearchParams();
 
   return (
     <RoleGuard allowedRoles={["Admin", "Approver"]}>
-      <div className="space-y-6">
+      <div className="space-y-6" data-demo="approvals-list">
         <h1 className="text-2xl font-bold">Pending Approvals</h1>
 
         {!pendingReports ? (
@@ -49,7 +52,7 @@ export default function ApprovalsListPage() {
                     </TableCell>
                     <TableCell className="text-right">
                       <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
-                        <Link href={`/approvals/${report._id}`}><Eye className="h-4 w-4" /></Link>
+                        <Link href={withPreservedDemoQuery(`/approvals/${report._id}`, searchParams)}><Eye className="h-4 w-4" /></Link>
                       </Button>
                     </TableCell>
                   </TableRow>
