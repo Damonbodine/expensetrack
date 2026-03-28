@@ -22,6 +22,7 @@ type DemoStep = {
   routePrefix: string;
   target?: string;
   actionLabel?: string;
+  actionTarget?: string;
 };
 
 type DemoScenario = {
@@ -33,74 +34,76 @@ type DemoScenario = {
 };
 
 const EXPENSETRACK_SCENARIO: DemoScenario = {
-  id: "expense-approval-review",
-  title: "Expense Approval Review",
+  id: "expense-submitter-review",
+  title: "Expense Submission Review",
   estimatedMinutes: 2,
   description:
-    "Show how ExpenseTrack helps a nonprofit monitor spend, inspect submitted expenses, and review pending approvals.",
+    "Show how ExpenseTrack helps a nonprofit employee track spending, inspect submitted expenses, and package reimbursement reports.",
   steps: [
     {
       id: "dashboard-overview",
-      title: "Start with the finance overview",
+      title: "Start with the submitter dashboard",
       body:
-        "The admin dashboard summarizes total spending, pending approvals, approved spend this month, and reimbursed volume.",
+        "The personal dashboard summarizes current-month spending, pending reports, approved totals, and reimbursements for the logged-in staff member.",
       whyItMatters:
-        "Finance leaders need a fast, credible picture of expense operations before they trust the workflow underneath it.",
-      routePrefix: "/dashboard",
+        "Skeptical teams want to see that the app works for everyday staff, not just finance reviewers.",
+      routePrefix: "/my-dashboard",
       target: "[data-demo='dashboard-overview']",
-      actionLabel: "Open dashboard",
+      actionLabel: "Open my dashboard",
     },
     {
-      id: "dashboard-stats",
-      title: "Review the top-line expense metrics",
+      id: "dashboard-recent",
+      title: "Review recent expenses and reports",
       body:
-        "These cards give the team immediate visibility into spend and approval pressure across the organization.",
+        "The recent activity tables let staff jump directly from their summary view into the latest expenses and reports.",
       whyItMatters:
-        "This is what turns expense software from a data-entry tool into an oversight tool.",
-      routePrefix: "/dashboard",
-      target: "[data-demo='dashboard-stats']",
-    },
-    {
-      id: "budget-utilization",
-      title: "Check budget pressure before approving",
-      body:
-        "Budget utilization helps finance staff understand where approvals may push a line over plan.",
-      whyItMatters:
-        "Nonprofits need to know not just what was spent, but whether that spend still fits within program budgets.",
-      routePrefix: "/dashboard",
-      target: "[data-demo='budget-utilization']",
+        "This proves the dashboard is actionable instead of just being a wall of summary cards.",
+      routePrefix: "/my-dashboard",
+      target: "[data-demo='dashboard-recent']",
     },
     {
       id: "expenses-list",
-      title: "Open the submitted expenses workspace",
+      title: "Open the expenses workspace",
       body:
-        "The expenses page lets staff search by merchant, category, status, and amount before opening a specific record.",
+        "The expenses page lets staff search by merchant, category, status, and amount before opening a specific submission.",
       whyItMatters:
-        "This is where finance or submitters move from summary metrics into the actual transaction backlog.",
+        "This is where staff move from a personal summary into the transaction history they actually manage.",
       routePrefix: "/expenses",
       target: "[data-demo='expenses-list']",
       actionLabel: "Open expenses",
     },
     {
-      id: "approvals-list",
-      title: "Move into pending approvals",
+      id: "expense-detail",
+      title: "Inspect one submitted expense",
       body:
-        "The approvals queue shows which reports are waiting, who submitted them, and what total is at stake.",
+        "The expense detail view shows the amount, merchant, category, notes, and receipt handling for a single submission.",
       whyItMatters:
-        "This is the core operational choke point for any approval workflow, so it has to feel real and usable.",
-      routePrefix: "/approvals",
-      target: "[data-demo='approvals-list']",
-      actionLabel: "Open approvals",
+        "A walkthrough has to prove that users can drill into a real record without losing context.",
+      routePrefix: "/expenses/",
+      target: "[data-demo='expense-detail']",
+      actionTarget: "[data-demo='primary-expense-link']",
     },
     {
-      id: "approval-detail",
-      title: "Inspect one report before approval",
+      id: "reports-list",
+      title: "Move into expense reports",
       body:
-        "The report review screen gives approvers the full report context before they approve or reject.",
+        "Reports package expenses into reimbursement-ready bundles that staff can submit for review.",
       whyItMatters:
-        "This proves ExpenseTrack supports actual governance and review, not just a list of pending items.",
-      routePrefix: "/approvals/",
-      target: "[data-demo='approval-detail']",
+        "Nonprofits often reimburse through grouped reports, so the demo should show that packaging step clearly.",
+      routePrefix: "/reports",
+      target: "[data-demo='reports-list']",
+      actionLabel: "Open reports",
+    },
+    {
+      id: "report-detail",
+      title: "Inspect one report before submission",
+      body:
+        "The report detail view shows the report contents and status before it goes into review.",
+      whyItMatters:
+        "This closes the loop from raw expense entry to a real reimbursement packet.",
+      routePrefix: "/reports/",
+      target: "[data-demo='report-detail']",
+      actionTarget: "[data-demo='primary-report-link']",
     },
   ],
 };
@@ -184,6 +187,13 @@ export function DemoMode() {
 
   function nextStep() {
     if (!onExpectedRoute) {
+      if (activeStep.actionTarget) {
+        const target = document.querySelector<HTMLElement>(activeStep.actionTarget);
+        if (target) {
+          target.click();
+          return;
+        }
+      }
       const params = new URLSearchParams(searchParams.toString());
       params.set("demo", activeScenario.id);
       params.set("step", String(stepIndex + 1));
@@ -193,7 +203,11 @@ export function DemoMode() {
       router.push(`${route}?${params.toString()}`);
       return;
     }
-    if (!isLastStep) setStepIndex((prev) => prev + 1);
+    if (isLastStep) {
+      exitDemo();
+      return;
+    }
+    setStepIndex((prev) => prev + 1);
   }
 
   function previousStep() {
@@ -202,7 +216,7 @@ export function DemoMode() {
 
   function restartScenario() {
     setStepIndex(0);
-    router.push("/dashboard?demo=expense-approval-review&step=1");
+    router.push("/my-dashboard?demo=expense-submitter-review&step=1");
   }
 
   function exitDemo() {
@@ -299,7 +313,7 @@ export function DemoModeStartButton({ className }: { className?: string }) {
     <Button
       variant="outline"
       className={cn("gap-2", className)}
-      onClick={() => router.push("/dashboard?demo=expense-approval-review&step=1")}
+      onClick={() => router.push("/my-dashboard?demo=expense-submitter-review&step=1")}
     >
       <PlayCircle className="h-4 w-4" />
       Start guided demo

@@ -12,9 +12,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { Pencil, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { withPreservedDemoQuery } from "@/lib/demo";
 
 export default function ExpenseDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
+  const searchParams = useSearchParams();
   const expense = useQuery(api.expenses.getExpense, {
     expenseId: id as Id<"expenses">,
   });
@@ -35,18 +38,20 @@ export default function ExpenseDetailPage({ params }: { params: Promise<{ id: st
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-demo="expense-detail">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Button variant="ghost" size="icon" asChild>
-            <Link href="/expenses"><ArrowLeft className="h-4 w-4" /></Link>
+            <Link href={withPreservedDemoQuery("/expenses", searchParams)}>
+              <ArrowLeft className="h-4 w-4" />
+            </Link>
           </Button>
           <h1 className="text-2xl font-bold">{expense.title}</h1>
           <StatusBadge status={expense.status} />
         </div>
         {expense.status === "Draft" && (
           <Button variant="outline" asChild>
-            <Link href={`/expenses/${id}/edit`}>
+            <Link href={withPreservedDemoQuery(`/expenses/${id}/edit`, searchParams)}>
               <Pencil className="h-4 w-4 mr-1" /> Edit
             </Link>
           </Button>

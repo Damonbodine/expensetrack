@@ -10,9 +10,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { DollarSign, FileText, CheckCircle, Wallet } from "lucide-react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { DemoModeStartButton } from "@/components/demo-mode";
+import { withPreservedDemoQuery } from "@/lib/demo";
 
 export default function SubmitterDashboardPage() {
   const currentUser = useQuery(api.users.getCurrentUser);
+  const searchParams = useSearchParams();
   const dashboard = useQuery(
     api.dashboard.getSubmitterDashboard,
     currentUser ? {} : "skip",
@@ -32,8 +36,11 @@ export default function SubmitterDashboardPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold">My Dashboard</h1>
+    <div className="space-y-6" data-demo="dashboard-overview">
+      <div className="flex items-center justify-between gap-3">
+        <h1 className="text-2xl font-bold">My Dashboard</h1>
+        <DemoModeStartButton />
+      </div>
 
       {!dashboard ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -66,7 +73,7 @@ export default function SubmitterDashboardPage() {
             />
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6" data-demo="dashboard-recent">
             <Card className="border border-border">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base font-semibold">Recent Expenses</CardTitle>
@@ -87,7 +94,10 @@ export default function SubmitterDashboardPage() {
                       {dashboard.recentExpenses.map((e) => (
                         <TableRow key={e._id}>
                           <TableCell>
-                            <Link href={`/expenses/${e._id}`} className="font-medium text-primary hover:underline">
+                            <Link
+                              href={withPreservedDemoQuery(`/expenses/${e._id}`, searchParams)}
+                              className="font-medium text-primary hover:underline"
+                            >
                               {e.title}
                             </Link>
                           </TableCell>
@@ -121,7 +131,10 @@ export default function SubmitterDashboardPage() {
                       {dashboard.recentReports.map((r) => (
                         <TableRow key={r._id}>
                           <TableCell>
-                            <Link href={`/reports/${r._id}`} className="font-medium text-primary hover:underline">
+                            <Link
+                              href={withPreservedDemoQuery(`/reports/${r._id}`, searchParams)}
+                              className="font-medium text-primary hover:underline"
+                            >
                               {r.title}
                             </Link>
                           </TableCell>

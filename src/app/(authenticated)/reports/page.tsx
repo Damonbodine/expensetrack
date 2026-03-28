@@ -10,12 +10,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { Plus, Eye, Pencil } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { withPreservedDemoQuery } from "@/lib/demo";
 
 type ReportStatus = "Draft" | "Submitted" | "UnderReview" | "Approved" | "Rejected" | "Reimbursed";
 
 export default function ReportsListPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
   const reports = useQuery(api.expenseReports.listReports, {
@@ -23,7 +25,7 @@ export default function ReportsListPage() {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-demo="reports-list">
       <h1 className="text-2xl font-bold">Expense Reports</h1>
 
       <div className="flex items-center gap-3 flex-wrap">
@@ -42,7 +44,7 @@ export default function ReportsListPage() {
           </SelectContent>
         </Select>
         <div className="flex-1" />
-        <Button onClick={() => router.push("/reports/new")}>
+        <Button onClick={() => router.push(withPreservedDemoQuery("/reports/new", searchParams))}>
           <Plus className="h-4 w-4 mr-1" /> New Report
         </Button>
       </div>
@@ -68,7 +70,7 @@ export default function ReportsListPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {reports.map((report) => (
+              {reports.map((report, index) => (
                 <TableRow key={report._id}>
                   <TableCell className="font-medium">{report.title}</TableCell>
                   <TableCell className="text-muted-foreground">{report.submitter?.name ?? "Unknown"}</TableCell>
@@ -81,11 +83,18 @@ export default function ReportsListPage() {
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-1">
                       <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
-                        <Link href={`/reports/${report._id}`}><Eye className="h-4 w-4" /></Link>
+                        <Link
+                          href={withPreservedDemoQuery(`/reports/${report._id}`, searchParams)}
+                          data-demo={index === 0 ? "primary-report-link" : undefined}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Link>
                       </Button>
                       {report.status === "Draft" && (
                         <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
-                          <Link href={`/reports/${report._id}/edit`}><Pencil className="h-4 w-4" /></Link>
+                          <Link href={withPreservedDemoQuery(`/reports/${report._id}/edit`, searchParams)}>
+                            <Pencil className="h-4 w-4" />
+                          </Link>
                         </Button>
                       )}
                     </div>

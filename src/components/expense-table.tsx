@@ -168,7 +168,7 @@ export function ExpenseTable() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {sorted.map((expense: any) => (
+              {sorted.map((expense: any, index: number) => (
                 <TableRow key={expense._id}>
                   <TableCell className="font-medium">{expense.title}</TableCell>
                   <TableCell className="text-muted-foreground">{expense.merchant}</TableCell>
@@ -192,7 +192,10 @@ export function ExpenseTable() {
                         className="h-8 w-8"
                         asChild
                       >
-                        <Link href={withPreservedDemoQuery(`/expenses/${expense._id}`, searchParams)}>
+                        <Link
+                          href={withPreservedDemoQuery(`/expenses/${expense._id}`, searchParams)}
+                          data-demo={index === 0 ? "primary-expense-link" : undefined}
+                        >
                           <Eye className="h-4 w-4" />
                         </Link>
                       </Button>
