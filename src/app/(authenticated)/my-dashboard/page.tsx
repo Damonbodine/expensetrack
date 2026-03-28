@@ -12,7 +12,24 @@ import { DollarSign, FileText, CheckCircle, Wallet } from "lucide-react";
 import Link from "next/link";
 
 export default function SubmitterDashboardPage() {
-  const dashboard = useQuery(api.dashboard.getSubmitterDashboard);
+  const currentUser = useQuery(api.users.getCurrentUser);
+  const dashboard = useQuery(
+    api.dashboard.getSubmitterDashboard,
+    currentUser ? {} : "skip",
+  );
+
+  if (currentUser === undefined || currentUser === null) {
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-8 w-40" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[...Array(4)].map((_, i) => (
+            <Skeleton key={i} className="h-[120px]" />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

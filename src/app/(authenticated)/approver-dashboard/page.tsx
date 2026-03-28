@@ -14,7 +14,24 @@ import { CheckSquare, Clock, Building2 } from "lucide-react";
 import Link from "next/link";
 
 export default function ApproverDashboardPage() {
-  const dashboard = useQuery(api.dashboard.getApproverDashboard);
+  const currentUser = useQuery(api.users.getCurrentUser);
+  const dashboard = useQuery(
+    api.dashboard.getApproverDashboard,
+    currentUser?.role === "Approver" || currentUser?.role === "Admin" ? {} : "skip",
+  );
+
+  if (currentUser === undefined || currentUser === null) {
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-8 w-48" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {[...Array(3)].map((_, i) => (
+            <Skeleton key={i} className="h-[120px]" />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <RoleGuard allowedRoles={["Approver", "Admin"]}>
