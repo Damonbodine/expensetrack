@@ -12,6 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatCurrency, formatDate } from "@/lib/utils";
+import { BudgetVarianceExplainer } from "@/components/ai/budget-variance-explainer";
 import { ArrowLeft, Pencil } from "lucide-react";
 import Link from "next/link";
 
@@ -104,6 +105,23 @@ export default function BudgetLineDetailPage({ params }: { params: Promise<{ id:
                 )}
               </CardContent>
             </Card>
+
+            <BudgetVarianceExplainer
+              budgetLineName={budgetLine.name}
+              categoryName={budgetLine.category?.name ?? "Unknown"}
+              department={budgetLine.department}
+              fiscalYear={budgetLine.fiscalYear}
+              budgetedAmount={budgetLine.budgetedAmount}
+              spentAmount={budgetLine.spentAmount}
+              remainingAmount={budgetLine.remainingAmount}
+              expenses={budgetLine.expenses.map((exp) => ({
+                title: exp.title,
+                amount: exp.amount,
+                merchant: exp.merchant,
+                date: exp.date,
+                status: exp.status,
+              }))}
+            />
           </>
         )}
       </div>

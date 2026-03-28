@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as ai from "../ai.js";
 import type * as approvals from "../approvals.js";
 import type * as auditLogs from "../auditLogs.js";
 import type * as budgetLines from "../budgetLines.js";
@@ -29,6 +30,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  ai: typeof ai;
   approvals: typeof approvals;
   auditLogs: typeof auditLogs;
   budgetLines: typeof budgetLines;

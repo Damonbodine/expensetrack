@@ -12,6 +12,19 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
+import { SmartReceiptParser } from "@/components/ai/smart-receipt-parser";
+import { ComplianceChecker } from "@/components/ai/compliance-checker";
+
+const CATEGORY_MAP: Record<string, string> = {
+  "Travel": "Travel",
+  "Meals": "Meals",
+  "Supplies": "Supplies",
+  "Equipment": "Equipment",
+  "Software": "Software",
+  "Training": "Training",
+  "Marketing": "Marketing",
+  "Other": "Other",
+};
 
 const PAYMENT_METHODS = [
   { value: "CreditCard", label: "Credit Card" },
@@ -58,6 +71,22 @@ export function ExpenseForm({ mode, expenseId, defaultValues }: ExpenseFormProps
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [showCompliance, setShowCompliance] = useState(false);
+
+  function handleAiParsed(data: { amount: number | null; vendor: string | null; date: string | null; category: string | null; purpose: string | null; receiptNeeded: boolean }) {
+    if (data.amount != null) setAmount(data.amount.toString());
+    if (data.vendor) setMerchant(data.vendor);
+    if (data.date) setDate(data.date);
+    if (data.purpose) setDescription(data.purpose);
+    // Try to match AI category to an existing category
+    if (data.category && categories) {
+      const matchedCategory = categories.find((cat) =>
+        cat.name.toLowerCase().includes(data.category!.toLowerCase()) ||
+        data.category!.toLowerCase().includes(cat.name.toLowerCase())
+      );
+      if (matchedCategory) setCategoryId(matchedCategory._id);
+    }
+  }
 
   function validate(): boolean {
     const newErrors: Record<string, string> = {};
@@ -128,6 +157,9 @@ export function ExpenseForm({ mode, expenseId, defaultValues }: ExpenseFormProps
       </CardHeader>
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4">
+          {mode === "create" && (
+            <SmartReceiptParser onParsed={handleAiParsed} />
+          )}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="title">Title *</Label>
@@ -187,6 +219,16 @@ export function ExpenseForm({ mode, expenseId, defaultValues }: ExpenseFormProps
             <Input id="receipt" type="file" accept=".jpg,.jpeg,.png,.pdf" onChange={(e) => setReceiptFile(e.target.files?.[0] ?? null)} />
             <p className="text-xs text-muted-foreground">Accepts JPEG, PNG, or PDF up to 10MB</p>
           </div>
+          {title && amount && parseFloat(amount) > 0 && categoryId && (
+            <ComplianceChecker
+              title={title}
+              amount={parseFloat(amount)}
+              categoryName={categories?.find((c) => c._id === categoryId)?.name ?? "Unknown"}
+              merchant={merchant}
+              description={description || undefined}
+              hasReceipt={!!receiptFile}
+            />
+          )}
         </CardContent>
         <CardFooter className="flex justify-between">
           <Button type="button" variant="outline" onClick={() => router.back()}>Cancel</Button>

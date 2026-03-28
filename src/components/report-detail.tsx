@@ -18,6 +18,7 @@ import {
 import { StatusBadge } from "@/components/status-badge";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { Pencil, Trash2, Send, FileText, DollarSign } from "lucide-react";
+import { ReportNarrative } from "@/components/ai/report-narrative";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -242,6 +243,21 @@ export function ReportDetail({ reportId }: ReportDetailProps) {
           )}
         </CardContent>
       </Card>
+
+      {expenses && expenses.length > 0 && (
+        <ReportNarrative
+          reportTitle={report.title}
+          reportPeriod={report.period ?? undefined}
+          totalAmount={report.totalAmount}
+          expenses={expenses.map((exp: any) => ({
+            title: exp.title,
+            amount: exp.amount,
+            merchant: exp.merchant,
+            categoryName: exp.category?.name ?? "Uncategorized",
+            date: exp.date,
+          }))}
+        />
+      )}
     </div>
   );
 }
