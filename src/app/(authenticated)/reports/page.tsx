@@ -44,7 +44,10 @@ export default function ReportsListPage() {
           </SelectContent>
         </Select>
         <div className="flex-1" />
-        <Button onClick={() => router.push(withPreservedDemoQuery("/reports/new", searchParams))}>
+        <Button
+          data-demo="primary-new-report"
+          onClick={() => router.push(withPreservedDemoQuery("/reports/new", searchParams))}
+        >
           <Plus className="h-4 w-4 mr-1" /> New Report
         </Button>
       </div>

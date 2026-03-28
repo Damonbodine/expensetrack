@@ -73,15 +73,15 @@ const EXPENSETRACK_SCENARIO: DemoScenario = {
       actionLabel: "Open expenses",
     },
     {
-      id: "expense-detail",
-      title: "Inspect one submitted expense",
+      id: "expense-create",
+      title: "Start a new expense submission",
       body:
-        "The expense detail view shows the amount, merchant, category, notes, and receipt handling for a single submission.",
+        "The new expense form captures the title, amount, merchant, category, payment method, and receipt details for a submission.",
       whyItMatters:
-        "A walkthrough has to prove that users can drill into a real record without losing context.",
-      routePrefix: "/expenses/",
-      target: "[data-demo='expense-detail']",
-      actionTarget: "[data-demo='primary-expense-link']",
+        "Even when an account starts empty, the demo should show how quickly staff can begin a compliant submission.",
+      routePrefix: "/expenses/new",
+      target: "[data-demo='expense-create']",
+      actionTarget: "[data-demo='primary-new-expense']",
     },
     {
       id: "reports-list",
@@ -95,15 +95,15 @@ const EXPENSETRACK_SCENARIO: DemoScenario = {
       actionLabel: "Open reports",
     },
     {
-      id: "report-detail",
-      title: "Inspect one report before submission",
+      id: "report-create",
+      title: "Start a reimbursement report",
       body:
-        "The report detail view shows the report contents and status before it goes into review.",
+        "The report form packages expenses into a reimbursement-ready submission with a title, period, and optional expense selection.",
       whyItMatters:
-        "This closes the loop from raw expense entry to a real reimbursement packet.",
-      routePrefix: "/reports/",
-      target: "[data-demo='report-detail']",
-      actionTarget: "[data-demo='primary-report-link']",
+        "This closes the loop from individual spend entry to a real packet staff can hand off for approval.",
+      routePrefix: "/reports/new",
+      target: "[data-demo='report-create']",
+      actionTarget: "[data-demo='primary-new-report']",
     },
   ],
 };
