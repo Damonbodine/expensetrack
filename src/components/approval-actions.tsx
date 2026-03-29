@@ -63,7 +63,7 @@ export function ApprovalActions({ reportId, submittedById }: ApprovalActionsProp
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-demo="approval-actions">
       <Card className="border border-border">
         <CardHeader className="pb-3">
           <CardTitle className="text-base font-semibold flex items-center gap-2">

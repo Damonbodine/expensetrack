@@ -9,6 +9,7 @@ import { BudgetProgressBar } from "@/components/budget-progress-bar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
+import { DemoModeStartButton } from "@/components/demo-mode";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { CheckSquare, Clock, Building2 } from "lucide-react";
 import Link from "next/link";
@@ -35,8 +36,14 @@ export default function ApproverDashboardPage() {
 
   return (
     <RoleGuard allowedRoles={["Approver", "Admin"]}>
-      <div className="space-y-6">
-        <h1 className="text-2xl font-bold">Approver Dashboard</h1>
+      <div className="space-y-6" data-demo="approver-dashboard-overview">
+        <div className="flex items-center justify-between gap-3">
+          <h1 className="text-2xl font-bold">Approver Dashboard</h1>
+          <DemoModeStartButton
+            scenarioId="expense-approver-review"
+            label="Start approver demo"
+          />
+        </div>
 
         {!dashboard ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -46,7 +53,7 @@ export default function ApproverDashboardPage() {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4" data-demo="approver-dashboard-queue">
               <StatCard
                 title="Pending Reviews"
                 value={dashboard.pendingReviewsCount}

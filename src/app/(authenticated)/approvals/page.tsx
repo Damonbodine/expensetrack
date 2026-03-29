@@ -41,7 +41,7 @@ export default function ApprovalsListPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {pendingReports.map((report) => (
+                {pendingReports.map((report, index) => (
                   <TableRow key={report._id}>
                     <TableCell className="font-medium">{report.title}</TableCell>
                     <TableCell className="text-muted-foreground">{report.submitter?.name ?? "Unknown"}</TableCell>
@@ -52,7 +52,12 @@ export default function ApprovalsListPage() {
                     </TableCell>
                     <TableCell className="text-right">
                       <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
-                        <Link href={withPreservedDemoQuery(`/approvals/${report._id}`, searchParams)}><Eye className="h-4 w-4" /></Link>
+                        <Link
+                          href={withPreservedDemoQuery(`/approvals/${report._id}`, searchParams)}
+                          data-demo={index === 0 ? "primary-approval-link" : undefined}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Link>
                       </Button>
                     </TableCell>
                   </TableRow>

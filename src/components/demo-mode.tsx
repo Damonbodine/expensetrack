@@ -108,8 +108,78 @@ const EXPENSETRACK_SCENARIO: DemoScenario = {
   ],
 };
 
+const EXPENSETRACK_APPROVER_SCENARIO: DemoScenario = {
+  id: "expense-approver-review",
+  title: "Expense Approval Review",
+  estimatedMinutes: 2,
+  description:
+    "Show how an approver reviews queue pressure, opens a pending report, and makes a defensible reimbursement decision.",
+  steps: [
+    {
+      id: "approver-dashboard-overview",
+      title: "Start with the approver dashboard",
+      body:
+        "The approver dashboard highlights pending reviews, recent decisions, and department-level spending pressure for the person responsible for signoff.",
+      whyItMatters:
+        "Finance reviewers need a queue-oriented view that helps them prioritize decisions instead of hunting through raw expense records.",
+      routePrefix: "/approver-dashboard",
+      target: "[data-demo='approver-dashboard-overview']",
+      actionLabel: "Open approver dashboard",
+    },
+    {
+      id: "approver-dashboard-queue",
+      title: "Inspect review volume and recent decisions",
+      body:
+        "This screen shows how many reports are still waiting, what has been decided recently, and which departments are driving the most spend.",
+      whyItMatters:
+        "A nonprofit finance lead needs immediate signal on queue load and departmental risk before opening an individual report.",
+      routePrefix: "/approver-dashboard",
+      target: "[data-demo='approver-dashboard-queue']",
+    },
+    {
+      id: "approvals-list",
+      title: "Move into the approvals queue",
+      body:
+        "The approvals workspace narrows the reviewer into the exact reports awaiting action, with submitter, total, and status visible at a glance.",
+      whyItMatters:
+        "This proves the workflow supports real operational triage rather than hiding everything behind a dashboard summary.",
+      routePrefix: "/approvals",
+      target: "[data-demo='approvals-list']",
+      actionLabel: "Open approvals",
+    },
+    {
+      id: "approval-detail",
+      title: "Open a pending report for review",
+      body:
+        "Reviewers can jump directly from the queue into a full report detail page with receipts, line items, and approval history.",
+      whyItMatters:
+        "Skeptical teams want to see the actual review surface, not just a list of pending records.",
+      routePrefix: "/approvals/",
+      target: "[data-demo='approval-detail']",
+      actionLabel: "Open report",
+      actionTarget: "[data-demo='primary-approval-link']",
+    },
+    {
+      id: "approval-actions",
+      title: "Show the decision controls",
+      body:
+        "Approvers can approve, return, or reject a report with documented comments, then send it back into the workflow.",
+      whyItMatters:
+        "This is the control point that proves ExpenseTrack supports real governance, not just expense intake.",
+      routePrefix: "/approvals/",
+      target: "[data-demo='approval-actions']",
+    },
+  ],
+};
+
+const SCENARIO_START_PATHS: Record<string, string> = {
+  "expense-submitter-review": "/my-dashboard?demo=expense-submitter-review&step=1",
+  "expense-approver-review": "/approver-dashboard?demo=expense-approver-review&step=1",
+};
+
 function getScenarioById(id: string | null): DemoScenario | null {
   if (id === EXPENSETRACK_SCENARIO.id) return EXPENSETRACK_SCENARIO;
+  if (id === EXPENSETRACK_APPROVER_SCENARIO.id) return EXPENSETRACK_APPROVER_SCENARIO;
   return null;
 }
 
@@ -216,7 +286,7 @@ export function DemoMode() {
 
   function restartScenario() {
     setStepIndex(0);
-    router.push("/my-dashboard?demo=expense-submitter-review&step=1");
+    router.push(SCENARIO_START_PATHS[activeScenario.id] ?? SCENARIO_START_PATHS["expense-submitter-review"]);
   }
 
   function exitDemo() {
@@ -307,16 +377,28 @@ export function DemoMode() {
   );
 }
 
-export function DemoModeStartButton({ className }: { className?: string }) {
+export function DemoModeStartButton({
+  className,
+  scenarioId = "expense-submitter-review",
+  label = "Start guided demo",
+}: {
+  className?: string;
+  scenarioId?: keyof typeof SCENARIO_START_PATHS;
+  label?: string;
+}) {
   const router = useRouter();
   return (
     <Button
       variant="outline"
       className={cn("gap-2", className)}
-      onClick={() => router.push("/my-dashboard?demo=expense-submitter-review&step=1")}
+      onClick={() =>
+        router.push(
+          SCENARIO_START_PATHS[scenarioId] ?? SCENARIO_START_PATHS["expense-submitter-review"],
+        )
+      }
     >
       <PlayCircle className="h-4 w-4" />
-      Start guided demo
+      {label}
     </Button>
   );
 }
